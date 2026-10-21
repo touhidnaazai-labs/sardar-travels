@@ -53,8 +53,9 @@ export function Hero({
 
   return (
     <>
-      <section className="grain relative isolate flex min-h-[min(46rem,calc(100svh-4rem))] flex-col justify-end overflow-hidden bg-ink pb-28 text-white md:pb-32">
-        <motion.div style={{ y }} className="absolute inset-0 -z-10">
+      <section className="grain relative isolate flex flex-col overflow-hidden bg-ink text-white md:min-h-[min(46rem,calc(100svh-4rem))] md:justify-end md:pb-32">
+        {/* Phones: the whole photo sits above the text. md+: full-bleed behind it. */}
+        <motion.div style={{ y }} className="relative aspect-[4/3] w-full overflow-hidden md:absolute md:inset-0 md:-z-10 md:aspect-auto">
           <AnimatePresence initial={false}>
             {slide && (
               <motion.div key={slide.media.id} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1.6, ease: "easeInOut" }}>
@@ -71,11 +72,12 @@ export function Hero({
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,17,38,.45)_0%,rgba(9,17,38,.1)_35%,rgba(9,17,38,.82)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,17,38,.7)_0%,transparent_65%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_62%,var(--ink))] md:hidden" />
+          <div className="absolute inset-0 hidden bg-[linear-gradient(180deg,rgba(9,17,38,.45)_0%,rgba(9,17,38,.1)_35%,rgba(9,17,38,.82)_100%)] md:block" />
+          <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,rgba(9,17,38,.7)_0%,transparent_65%)] md:block" />
         </motion.div>
 
-        <div className="container-x pt-24">
+        <div className="container-x pt-3 pb-28 md:pt-24 md:pb-0">
           <motion.p
             className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-[0.14em] uppercase backdrop-blur"
             initial={{ opacity: 0, y: 10 }}

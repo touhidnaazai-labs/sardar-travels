@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Footer } from "@/components/site/footer";
 import { ActionBar, Header, type NavItem } from "@/components/site/header";
 import { JsonLd } from "@/components/site/json-ld";
@@ -52,7 +53,9 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       />
       <main id="main">{children}</main>
       <Footer site={site} nav={nav} pages={pages} />
-      <ScrollTopOnLoad />
+      <Suspense fallback={null}>
+        <ScrollTopOnLoad />
+      </Suspense>
       <ToastHost />
       <Analytics />
       <ActionBar phone={site.contact.phone} whatsapp={site.contact.whatsapp} />
