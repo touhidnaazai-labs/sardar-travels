@@ -46,3 +46,8 @@ next-env.d.ts
 
 # Owner-supplied reference material (third-party brochure, screenshots) - keep local
 /brochure-reference/
+
+# Tooling added by integrations; not part of the site
+/.agents/
+/.claude/
+/skills-lock.json

@@ -1,0 +1,5 @@
+.qa
+brochure-reference
+.env*
+.next
+node_modules
