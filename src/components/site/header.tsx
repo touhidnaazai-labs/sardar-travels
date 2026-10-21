@@ -43,6 +43,8 @@ function HeaderWithPath(props: HeaderProps) {
 function HeaderView({ siteName, logo, nav, phone, whatsapp, announcement, pathname }: HeaderProps & { pathname: string | null }) {
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const [menuTop, setMenuTop] = useState(64);
 
   // Close the mobile menu on navigation.
   const [lastPath, setLastPath] = useState(pathname);
@@ -81,7 +83,7 @@ function HeaderView({ siteName, logo, nav, phone, whatsapp, announcement, pathna
       </a>
       {announcement && <div className="bg-accent px-4 py-2 text-center text-sm font-semibold text-ink">{announcement}</div>}
 
-      <header className="sticky top-0 z-50 border-b border-line bg-white/92 text-ink backdrop-blur-md">
+      <header ref={headerRef} className="sticky top-0 z-50 border-b border-line bg-white/92 text-ink backdrop-blur-md">
         <div className="container-x flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
           <HomeLink className="group flex shrink-0 items-center gap-2.5" label={`${siteName} — home`}>
             {logo ? (
@@ -123,54 +125,60 @@ function HeaderView({ siteName, logo, nav, phone, whatsapp, announcement, pathna
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label={open ? "Close menu" : "Open menu"}
-              onClick={() => setOpen((o) => !o)}
+              onClick={() => {
+                if (!open && headerRef.current) setMenuTop(Math.round(headerRef.current.getBoundingClientRect().bottom));
+                setOpen((o) => !o);
+              }}
             >
               {open ? <X className="size-6" /> : <Menu className="size-6" />}
             </button>
           </div>
         </div>
 
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              id="mobile-menu"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-              className="fixed inset-x-0 top-16 bottom-0 overflow-y-auto border-t border-line bg-white text-ink lg:hidden"
-            >
-              <nav aria-label="Mobile" className="container-x flex flex-col py-4">
-                {[{ href: "/", label: "Home" }, ...nav].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn("border-b border-line py-4 font-display text-2xl font-semibold", isActive(item.href) && "text-forest")}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Link href="/enquiry/track" className="border-b border-line py-4 font-display text-2xl font-semibold">
-                  Track my enquiry
-                </Link>
-                <div className="mt-6 grid gap-3">
-                  <Link href="/plan" className="btn btn-primary w-full">Get a free quote</Link>
-                  {phone && (
-                    <a href={tel} className="btn btn-dark w-full">
-                      <Phone className="size-4" aria-hidden /> Call {phone}
-                    </a>
-                  )}
-                  {whatsapp && (
-                    <a href={whatsappLink(whatsapp, "Hello Sardar Travels, I'd like to plan a trip.")} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp w-full">
-                      <MessageCircle className="size-4" aria-hidden /> Chat on WhatsApp
-                    </a>
-                  )}
-                </div>
-              </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
+
+      {/* Outside <header>: its backdrop-blur would otherwise become the containing block for this fixed panel and collapse it. */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id="mobile-menu"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            style={{ top: menuTop }}
+            className="fixed inset-x-0 bottom-0 z-[45] overflow-y-auto border-t border-line bg-white text-ink lg:hidden"
+          >
+            <nav aria-label="Mobile" className="container-x flex flex-col py-4">
+              {[{ href: "/", label: "Home" }, ...nav].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn("border-b border-line py-4 font-display text-2xl font-semibold", isActive(item.href) && "text-forest")}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Link href="/enquiry/track" className="border-b border-line py-4 font-display text-2xl font-semibold">
+                Track my enquiry
+              </Link>
+              <div className="mt-6 grid gap-3">
+                <Link href="/plan" className="btn btn-primary w-full">Get a free quote</Link>
+                {phone && (
+                  <a href={tel} className="btn btn-dark w-full">
+                    <Phone className="size-4" aria-hidden /> Call {phone}
+                  </a>
+                )}
+                {whatsapp && (
+                  <a href={whatsappLink(whatsapp, "Hello Sardar Travels, I'd like to plan a trip.")} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp w-full">
+                    <MessageCircle className="size-4" aria-hidden /> Chat on WhatsApp
+                  </a>
+                )}
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
