@@ -50,7 +50,7 @@ async function BrandStyle() {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={`${display.variable} ${body.variable} antialiased`}>
+    <html lang="en-IN" data-scroll-behavior="smooth" className={`${display.variable} ${body.variable} antialiased`}>
       <head>
         <BrandStyle />
       </head>
