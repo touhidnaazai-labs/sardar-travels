@@ -53,7 +53,7 @@ export function HowItWorks() {
         {[
           ["Send your request", "Takes about a minute. You’ll receive a reference number immediately."],
           ["We check and quote", "We confirm availability and send you a clear price."],
-          ["You confirm", "Accept the quote online or reply to us — only then is anything booked."],
+          ["You confirm", "Reply to confirm — only then is anything booked."],
         ].map(([t, b], i) => (
           <li key={t} className="flex gap-4">
             <span className="font-display text-3xl leading-none font-medium text-accent italic">{i + 1}</span>

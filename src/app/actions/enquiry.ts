@@ -1,25 +1,22 @@
 "use server";
 
 import { randomInt } from "node:crypto";
-import { redirect } from "next/navigation";
 import { after } from "next/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getSiteSettings } from "@/lib/data";
 import { sendEnquiryEmails } from "@/lib/email";
-import {
-  STATUS_EXPLAINERS,
-  STATUS_LABELS,
-  TYPE_LABELS,
-  enquirySchema,
-} from "@/lib/enquiry-schema";
+import { TYPE_LABELS, enquirySchema, humanize, type EnquiryInput } from "@/lib/enquiry-schema";
 import { clientIpHash, rateLimit } from "@/lib/security";
-import { formatPrice } from "@/lib/utils";
 
 export type FormState = {
   ok: boolean;
   message?: string;
   errors?: Record<string, string>;
+  /** Set on success: the reference and the ready-to-send WhatsApp message. */
+  reference?: string;
+  whatsappText?: string;
+  whatsappNumber?: string;
 };
 
 const REF_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -150,120 +147,30 @@ export async function submitEnquiry(_prev: FormState, fd: FormData): Promise<For
     }),
   );
 
-  redirect(`/enquiry/received?ref=${encodeURIComponent(reference)}`);
-}
-
-/* ------------------------------------------------------------------ */
-/* Customer self-service tracking                                      */
-/* ------------------------------------------------------------------ */
-
-export type TrackState = FormState & {
-  enquiry?: {
-    reference: string;
-    status: keyof typeof STATUS_LABELS;
-    statusLabel: string;
-    explainer: string;
-    subject: string;
-    typeLabel: string;
-    travelDate: string | null;
-    submittedOn: string;
-    quote?: { amountText: string; summary: string; validUntil: string | null; sentOn: string };
-    canAccept: boolean;
-  };
-  ref?: string;
-  contact?: string;
-};
-
-const digits = (s: string) => s.replace(/\D/g, "");
-
-async function findForCustomer(ref: string, contact: string) {
-  const [e] = await db
-    .select()
-    .from(schema.enquiries)
-    .where(eq(schema.enquiries.reference, ref.trim().toUpperCase()));
-  if (!e) return null;
-  const c = contact.trim().toLowerCase();
-  const emailMatch = c.includes("@") && c === e.email.toLowerCase();
-  const phoneMatch = digits(c).length >= 7 && digits(e.phone).slice(-10) === digits(c).slice(-10);
-  return emailMatch || phoneMatch ? e : null;
-}
-
-async function toTrackState(e: typeof schema.enquiries.$inferSelect, ref: string, contact: string): Promise<TrackState> {
-  const [quote] = await db
-    .select()
-    .from(schema.quotes)
-    .where(eq(schema.quotes.enquiryId, e.id))
-    .orderBy(desc(schema.quotes.createdAt))
-    .limit(1);
-  const fmt = (d: Date) => d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kolkata" });
   return {
     ok: true,
-    ref,
-    contact,
-    enquiry: {
-      reference: e.reference,
-      status: e.status,
-      statusLabel: STATUS_LABELS[e.status],
-      explainer: STATUS_EXPLAINERS[e.status],
-      subject: e.subject || TYPE_LABELS[e.type],
-      typeLabel: TYPE_LABELS[e.type],
-      travelDate: e.travelDate,
-      submittedOn: fmt(e.createdAt),
-      quote: quote
-        ? {
-            amountText: formatPrice(quote.amount, quote.currency),
-            summary: quote.summary,
-            validUntil: quote.validUntil,
-            sentOn: fmt(quote.createdAt),
-          }
-        : undefined,
-      canAccept: e.status === "quote_sent" && !!quote,
-    },
+    reference,
+    whatsappText: buildWhatsAppText({ reference, subject, input }),
+    whatsappNumber: (site.contact.whatsapp || site.contact.phone).replace(/\D/g, ""),
   };
 }
 
-export async function trackEnquiry(_prev: TrackState, fd: FormData): Promise<TrackState> {
-  const ref = str(fd, "ref").trim();
-  const contact = str(fd, "contact").trim();
-  if (!ref || !contact) {
-    return { ok: false, message: "Enter your reference and the email or phone number you used.", ref, contact };
-  }
-  const ipHash = await clientIpHash();
-  if (!(await rateLimit(`track:${ipHash}`, 20, 600))) {
-    return { ok: false, message: "Too many attempts. Please wait a few minutes.", ref, contact };
-  }
-  const e = await findForCustomer(ref, contact);
-  if (!e) {
-    return { ok: false, message: "We couldn't find an enquiry matching those details. Check the reference and contact you used.", ref, contact };
-  }
-  return toTrackState(e, ref, contact);
-}
+const fmtDate = (iso?: string) => (iso ? new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "");
 
-export async function acceptQuote(_prev: TrackState, fd: FormData): Promise<TrackState> {
-  const ref = str(fd, "ref");
-  const contact = str(fd, "contact");
-  const ipHash = await clientIpHash();
-  if (!(await rateLimit(`track:${ipHash}`, 20, 600))) {
-    return { ok: false, message: "Too many attempts. Please wait a few minutes.", ref, contact };
-  }
-  const e = await findForCustomer(ref, contact);
-  if (!e) return { ok: false, message: "We couldn't verify this enquiry.", ref, contact };
-  if (e.status !== "quote_sent") return toTrackState(e, ref, contact);
-
-  await db.transaction(async (tx) => {
-    await tx
-      .update(schema.enquiries)
-      .set({ status: "awaiting_confirmation", updatedAt: new Date() })
-      .where(and(eq(schema.enquiries.id, e.id), eq(schema.enquiries.status, "quote_sent")));
-    await tx.insert(schema.enquiryEvents).values({
-      enquiryId: e.id,
-      kind: "customer",
-      fromStatus: "quote_sent",
-      toStatus: "awaiting_confirmation",
-      note: "Customer accepted the quote online",
-    });
-  });
-  const updated = { ...e, status: "awaiting_confirmation" as const };
-  const state = await toTrackState(updated, ref, contact);
-  return { ...state, message: "Thank you — we've let our team know you'd like to go ahead." };
+/** The enquiry as a WhatsApp message the customer sends to the business. */
+function buildWhatsAppText({ reference, subject, input }: { reference: string; subject: string; input: EnquiryInput }) {
+  const pax = `${input.adults} adult${input.adults === 1 ? "" : "s"}${input.children ? `, ${input.children} child${input.children === 1 ? "" : "ren"}` : ""}`;
+  const lines = [
+    `*${TYPE_LABELS[input.type]}*${subject ? `: ${subject}` : ""}`,
+    `Name: ${input.name}`,
+    `Phone: ${input.phone}`,
+    input.email && `Email: ${input.email}`,
+    input.pickup && `From: ${input.pickup}`,
+    input.destination && `To: ${input.destination}`,
+    input.travelDate && `Date: ${fmtDate(input.travelDate)}${input.returnDate ? ` to ${fmtDate(input.returnDate)}` : ""}`,
+    `Travellers: ${pax}`,
+    ...Object.entries(input.details).map(([k, v]) => `${humanize(k)}: ${v}`),
+    input.message && `Message: ${input.message}`,
+  ].filter(Boolean);
+  return `Hello Sardar Travels, I'd like to enquire (ref ${reference}).\n\n${lines.join("\n")}`.slice(0, 1500);
 }

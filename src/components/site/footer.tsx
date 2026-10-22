@@ -33,7 +33,6 @@ export function Footer({
           <p className="mt-5 max-w-sm leading-relaxed text-ivory/65">{site.tagline}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/plan" className="btn btn-primary">Plan your journey</Link>
-            <Link href="/enquiry/track" className="btn btn-ghost-light">Track an enquiry</Link>
           </div>
         </div>
 

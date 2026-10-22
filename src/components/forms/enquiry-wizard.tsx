@@ -5,6 +5,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { submitEnquiry, type FormState } from "@/app/actions/enquiry";
 import { optLabel, optValue, type FieldDef } from "@/lib/form-fields";
+import { useRouter } from "next/navigation";
+import { storeHandoff } from "@/lib/handoff";
 import { cn } from "@/lib/utils";
 
 const CONTACT_FIELDS: FieldDef[] = [
@@ -107,6 +109,7 @@ export function EnquiryWizard({
   const [touchedErrors, setTouchedErrors] = useState<Record<string, string>>({});
   const [ack, setAck] = useState(false);
   const [state, action, pending] = useActionState<FormState, FormData>(submitEnquiry, { ok: false });
+  const router = useRouter();
   const startedAt = useRef(0);
   const topRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -115,6 +118,13 @@ export function EnquiryWizard({
   useEffect(() => {
     startedAt.current = Date.now();
   }, []);
+
+  // Saved: hand the enquiry to WhatsApp via the confirmation page.
+  useEffect(() => {
+    if (!state.ok) return;
+    const to = storeHandoff(state);
+    if (to) router.push(to);
+  }, [state, router]);
 
   // When the server rejects fields, jump back to the first step that has an error.
   const [handledState, setHandledState] = useState(state);

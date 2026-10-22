@@ -178,9 +178,6 @@ function HeaderView({ siteName, logo, nav, phone, whatsapp, announcement, pathna
                   </Link>
                 ),
               )}
-              <Link href="/enquiry/track" className="border-b border-line py-4 font-display text-2xl font-semibold">
-                Track my enquiry
-              </Link>
               <div className="mt-6 grid gap-3">
                 <Link href="/plan" className="btn btn-primary w-full">Get a free quote</Link>
                 {phone && (

@@ -3,35 +3,35 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { PageHero } from "@/components/site/page-hero";
-import { CopyButton } from "@/components/site/copy-button";
 import { TrackLead } from "@/components/site/analytics";
+import { WhatsAppHandoff } from "@/components/site/whatsapp-handoff";
+import { getSiteSettings } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Enquiry received", robots: { index: false } };
 
 const REF = /^ST-\d{6}-[A-Z2-9]{4}$/;
 
 async function Reference({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const sp = await searchParams;
+  const [sp, site] = await Promise.all([searchParams, getSiteSettings()]);
   const ref = typeof sp.ref === "string" && REF.test(sp.ref) ? sp.ref : null;
   if (!ref) {
     return (
       <p className="text-muted">
-        We couldn’t read an enquiry reference. If you’ve just sent an enquiry, check your email — or <Link className="underline" href="/enquiry/track">track an enquiry</Link>.
+        We couldn’t read an enquiry reference. If you’ve just sent an enquiry, you can still <Link className="underline" href="/contact">contact us</Link> directly.
       </p>
     );
   }
+  const number = (site.contact.whatsapp || site.contact.phone).replace(/\D/g, "");
   return (
     <>
       <p className="eyebrow">Your reference</p>
-      <div className="mt-3 flex flex-wrap items-center gap-4">
-        <p className="font-display text-[clamp(2.2rem,6vw,3.6rem)] font-medium tracking-wide">{ref}</p>
-        <CopyButton text={ref} />
-      </div>
-      <p className="mt-3 text-sm text-muted">Keep this reference to track your enquiry or when you speak with us.</p>
+      <p className="mt-3 font-display text-[clamp(2.2rem,6vw,3.6rem)] font-semibold tracking-wide">{ref}</p>
+      <p className="mt-3 text-sm text-muted">Quote this reference when you speak with us.</p>
       <TrackLead reference={ref} />
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link href={`/enquiry/track?ref=${ref}`} className="btn btn-dark">Track this enquiry</Link>
+      <WhatsAppHandoff reference={ref} fallbackNumber={number} />
+      <div className="mt-6 flex flex-wrap gap-3">
         <Link href="/tours" className="btn btn-ghost">Keep exploring</Link>
+        <Link href="/" className="btn btn-ghost">Back to home</Link>
       </div>
     </>
   );
@@ -43,7 +43,7 @@ export default function ReceivedPage(props: PageProps<"/enquiry/received">) {
       <PageHero size="sm" eyebrow="Thank you" title="We’ve received your enquiry" />
       <div className="container-x grid gap-14 py-16 md:py-24 lg:grid-cols-12">
         <div className="lg:col-span-7">
-          <div className="rounded-[1.75rem] bg-white p-8 shadow-[0_30px_80px_-40px_rgba(15,27,45,.45)] md:p-10">
+          <div className="rounded-[1.75rem] bg-white p-8 shadow-[0_30px_80px_-40px_rgba(15,28,58,.45)] md:p-10">
             <CheckCircle2 className="mb-6 size-10 text-forest" aria-hidden />
             <Suspense fallback={<div className="skeleton h-24" />}>
               <Reference searchParams={props.searchParams} />
@@ -54,13 +54,13 @@ export default function ReceivedPage(props: PageProps<"/enquiry/received">) {
           <p className="eyebrow mb-5">What happens next</p>
           <ol className="space-y-6">
             {[
-              ["This is not yet a booking", "Your enquiry is saved with our team. Nothing has been reserved or charged."],
-              ["We check availability", "We’ll review your dates and requirements and prepare a quote."],
-              ["You receive a quote", "We’ll contact you using your preferred method. You can also see the quote on the tracking page."],
-              ["You confirm", "Your trip is confirmed only once you accept the quote and we confirm it with you."],
+              ["This is not yet a booking", "Nothing has been reserved or charged."],
+              ["Send it on WhatsApp", "Tap the button so your details reach our team right away."],
+              ["We reply with a quote", "We’ll check availability and send a clear price on WhatsApp or by phone."],
+              ["You confirm", "Your trip is booked only once you reply to confirm and we confirm it back."],
             ].map(([t, b], i) => (
               <li key={t} className="flex gap-4">
-                <span className="font-display text-3xl leading-none font-medium text-accent italic">{i + 1}</span>
+                <span className="font-display text-3xl leading-none font-semibold text-accent-strong">{i + 1}</span>
                 <span><span className="block font-semibold">{t}</span><span className="text-sm text-muted">{b}</span></span>
               </li>
             ))}

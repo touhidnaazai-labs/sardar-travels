@@ -1,7 +1,6 @@
 /**
  * Shapes and defaults for the JSON documents stored in the `settings` table.
- * Every value here is editable from the admin dashboard; defaults only apply
- * until an administrator saves their own values.
+ * Defaults for the JSON documents stored in the `settings` table.
  */
 
 export type SiteSettings = {

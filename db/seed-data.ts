@@ -943,13 +943,6 @@ export const seedFaqs: { question: string; answer: string; topic: string; showOn
     answer: "Yes — pickup and drop are provided as a complimentary service. Your pickup point and time are confirmed with your booking.",
   },
   {
-    topic: "booking",
-    showOnHome: false,
-    question: "How can I check on my enquiry?",
-    answer:
-      "Use the “Track enquiry” page with your reference number and the email or phone number you used. You'll see its status and any quote we've sent.",
-  },
-  {
     topic: "wildlife",
     showOnHome: true,
     question: "Will we see wildlife in Bandipur or Mudumalai?",
@@ -1006,7 +999,7 @@ We will check availability and send a quote showing the price and what is includ
 
 ## Confirmation
 
-Your booking is confirmed only when you accept the quote and we confirm it with you directly.
+Your booking is confirmed only when you reply to confirm the quote and we confirm it back to you.
 
 ## Cancellation and refunds
 
@@ -1041,7 +1034,7 @@ Your details are used only to handle your enquiry and booking. They are visible 
 
 ## Security
 
-Enquiry data is held in a secured database and accessed through an authenticated staff dashboard. We keep a one-way hashed form of your IP address only to prevent spam.
+Enquiry data is held in a secured database, and your enquiry is sent to our team on WhatsApp. We keep a one-way hashed form of your IP address only to prevent spam.
 
 ## Cookies and analytics
 

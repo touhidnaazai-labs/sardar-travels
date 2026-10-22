@@ -95,7 +95,7 @@ export default async function HomePage() {
             {([
               [PhoneCall, "Share your plan", "Use the quote bar, call or WhatsApp us. Tell us where, when and how many."],
               [ReceiptText, "Receive a clear quote", "We call back with the itinerary and an exact price. Asking is always free."],
-              [Car, "Confirm and travel", "Accept the quote and we lock it in. Pickup and drop come at no extra cost."],
+              [Car, "Confirm and travel", "Reply to confirm and we lock it in. Pickup and drop come at no extra cost."],
             ] as const).map(([Icon, t, b], i) => (
               <Reveal as="li" key={t} delay={i * 0.08} className="relative">
                 <span className="relative z-10 grid size-14 place-items-center rounded-2xl bg-ink text-accent"><Icon className="size-6" aria-hidden /></span>

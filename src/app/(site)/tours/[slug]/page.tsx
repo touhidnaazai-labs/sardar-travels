@@ -319,7 +319,7 @@ async function TourContent({ params }: { params: Promise<{ slug: string }> }) {
               <ol className="mt-3 list-decimal space-y-1.5 pl-5">
                 <li>Send your enquiry — you’ll get a reference.</li>
                 <li>We confirm availability and send a quote.</li>
-                <li>Accept the quote and we confirm your trip.</li>
+                <li>Reply to confirm and we lock in your trip.</li>
               </ol>
             </div>
           </div>

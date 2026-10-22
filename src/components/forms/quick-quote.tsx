@@ -5,6 +5,8 @@ import { ArrowRight, Loader2, Lock } from "lucide-react";
 import { submitEnquiry, type FormState } from "@/app/actions/enquiry";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/site/toast";
+import { useRouter } from "next/navigation";
+import { storeHandoff } from "@/lib/handoff";
 
 export type QuickOption = { value: string; label: string; tourId?: string };
 
@@ -26,12 +28,19 @@ export function QuickQuote({
 }) {
   const uid = useId();
   const [state, action, pending] = useActionState<FormState, FormData>(submitEnquiry, { ok: false });
+  const router = useRouter();
   const [v, setV] = useState({ name: "", phone: "", need: "", travelDate: "", adults: "2" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const startedAt = useRef(0);
   useEffect(() => {
     startedAt.current = Date.now();
   }, []);
+
+  useEffect(() => {
+    if (!state.ok) return;
+    const to = storeHandoff(state);
+    if (to) router.push(to);
+  }, [state, router]);
 
   const [seen, setSeen] = useState(state);
   if (seen !== state) {
@@ -130,7 +139,7 @@ export function QuickQuote({
         </div>
         <button type="submit" disabled={pending} className={cn("btn btn-primary !py-3.5", bar ? "sm:col-span-2 lg:col-span-1" : "col-span-2 w-full text-base")}>
           {pending ? <Loader2 className="size-5 animate-spin" aria-hidden /> : null}
-          {pending ? "Sending…" : "Get my quote"}
+          {pending || state.ok ? "Sending…" : "Get my quote"}
           {!pending && <ArrowRight className="size-5" aria-hidden />}
         </button>
       </div>

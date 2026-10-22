@@ -7,7 +7,6 @@
  */
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
 import { scriptDb } from "./script-db";
 import { processImage } from "../src/lib/images";
@@ -158,24 +157,6 @@ async function main() {
     await db.update(schema.settings).set({ value: merged, updatedAt: new Date() }).where(eq(schema.settings.key, "services"));
   }
   console.log("✓ Settings");
-
-  // First administrator
-  const [{ n: userCount }] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.users);
-  if (!userCount) {
-    const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-    const password = process.env.ADMIN_PASSWORD;
-    if (email && password && password.length >= 10 && password !== "change-this-password") {
-      await db.insert(schema.users).values({
-        email,
-        name: process.env.ADMIN_NAME || "Administrator",
-        role: "admin",
-        passwordHash: await bcrypt.hash(password, 12),
-      });
-      console.log(`✓ Admin account created for ${email}`);
-    } else {
-      console.warn("! No admin created — set ADMIN_EMAIL and a strong ADMIN_PASSWORD (10+ chars), or run npm run admin:create");
-    }
-  }
 }
 
 await main();
