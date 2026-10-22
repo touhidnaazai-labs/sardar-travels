@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bus, Car, Compass, Hotel, Map } from "lucide-react";
+import { Bus, Car, Compass, Globe, Hotel, Map, Plane, Stamp, TrainFront } from "lucide-react";
 import type { FieldDef } from "@/lib/form-fields";
 import { cn } from "@/lib/utils";
 import { EnquiryWizard } from "./enquiry-wizard";
@@ -9,13 +9,13 @@ import { EnquiryWizard } from "./enquiry-wizard";
 export type PlannerTab = {
   key: string;
   label: string;
-  icon: "tour" | "vehicle" | "hotel" | "custom" | "bus";
-  type: "tour" | "planner" | "vehicle" | "hotel" | "intercity";
+  icon: "tour" | "vehicle" | "hotel" | "custom" | "bus" | "train" | "flight" | "visa" | "globe";
+  type: "tour" | "planner" | "vehicle" | "hotel" | "intercity" | "train" | "flight" | "visa" | "international";
   fields: FieldDef[];
   note?: string;
 };
 
-const ICONS = { tour: Map, vehicle: Car, hotel: Hotel, custom: Compass, bus: Bus };
+const ICONS = { tour: Map, vehicle: Car, hotel: Hotel, custom: Compass, bus: Bus, train: TrainFront, flight: Plane, visa: Stamp, globe: Globe };
 
 export function HomePlanner({ tabs }: { tabs: PlannerTab[] }) {
   const [active, setActive] = useState(tabs[0]?.key);

@@ -29,6 +29,8 @@ export const CATEGORY_LABELS: Record<string, string> = {
   "wildlife-nature": "Wildlife & nature",
   honeymoon: "Honeymoon",
   waterfalls: "Waterfalls",
+  "national-package": "National packages",
+  "international-package": "International packages",
 };
 
 export const STYLE_LABELS: Record<string, string> = {

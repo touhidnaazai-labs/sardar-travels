@@ -3,7 +3,7 @@ import { HomePlanner, type PlannerTab } from "@/components/forms/home-planner";
 import { PageHero } from "@/components/site/page-hero";
 import { HowItWorks } from "@/components/site/service-layout";
 import { getHomeSettings, getMediaMap, getPublishedBusRoutes, getPublishedDestinations, getPublishedTours, getServicesSettings } from "@/lib/data";
-import { hotelFields, intercityFields, plannerFields, tourEnquiryFields, vehicleFields } from "@/lib/enquiry-forms";
+import { flightFields, hotelFields, intercityFields, internationalFields, plannerFields, tourEnquiryFields, trainFields, vehicleFields, visaFields } from "@/lib/enquiry-forms";
 
 export const metadata: Metadata = {
   title: "Plan your journey",
@@ -20,6 +20,10 @@ export default async function PlanPage() {
     { key: "tour", label: "Tour package", icon: "tour", type: "tour", fields: tourEnquiryFields({ tours, multiDay: true }) },
     ...(services.vehicle.enabled ? [{ key: "vehicle", label: "Vehicle hire", icon: "vehicle", type: "vehicle", fields: vehicleFields(services.vehicle) } satisfies PlannerTab] : []),
     ...(services.hotel.enabled ? [{ key: "hotel", label: "Hotel stay", icon: "hotel", type: "hotel", fields: hotelFields(services.hotel) } satisfies PlannerTab] : []),
+    ...(services.flight.enabled ? [{ key: "flight", label: "Flights", icon: "flight", type: "flight", fields: flightFields(services.flight) } satisfies PlannerTab] : []),
+    ...(services.train.enabled ? [{ key: "train", label: "Trains", icon: "train", type: "train", fields: trainFields(services.train) } satisfies PlannerTab] : []),
+    ...(services.visa.enabled ? [{ key: "visa", label: "Visa", icon: "visa", type: "visa", fields: visaFields(services.visa) } satisfies PlannerTab] : []),
+    ...(services.international.enabled ? [{ key: "intl", label: "International", icon: "globe", type: "international", fields: internationalFields() } satisfies PlannerTab] : []),
     ...(services.intercity.enabled && routes.length ? [{ key: "bus", label: "Intercity bus", icon: "bus", type: "intercity", fields: intercityFields(routes) } satisfies PlannerTab] : []),
   ];
   const heroId = home.cta.imageId ?? home.hero.imageIds[0];

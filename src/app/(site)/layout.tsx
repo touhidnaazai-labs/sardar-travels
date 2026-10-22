@@ -16,14 +16,30 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
     getFooterPages(),
     getMediaMap(),
   ]);
+  const bookings = [
+    ...(services.flight.enabled ? [{ href: "/flight-booking", label: "Flights", hint: "Domestic & international" }] : []),
+    ...(services.train.enabled ? [{ href: "/train-booking", label: "Trains", hint: "Train ticket booking" }] : []),
+    ...(services.visa.enabled ? [{ href: "/visa", label: "Visa assistance", hint: "Documents & applications" }] : []),
+    ...(services.hotel.enabled ? [{ href: "/hotels", label: "Hotels", hint: "Mysuru, Ooty, Kodaikanal" }] : []),
+    ...(services.vehicle.enabled ? [{ href: "/vehicle-hire", label: "Vehicle hire", hint: "Cars, vans & more" }] : []),
+    ...(services.intercity.enabled ? [{ href: "/intercity", label: "Intercity buses", hint: "Overnight services" }] : []),
+  ];
   const nav: NavItem[] = [
-    { href: "/tours", label: "Tours" },
+    {
+      href: "/tours",
+      label: "Packages",
+      children: [
+        { href: "/tours", label: "Mysuru & local tours", hint: "Day trips and short holidays" },
+        { href: "/national-packages", label: "National packages", hint: "Kashmir, Goa, Kerala & more" },
+        ...(services.international.enabled ? [{ href: "/international-packages", label: "International packages", hint: "Holidays abroad" }] : []),
+      ],
+    },
     { href: "/destinations", label: "Destinations" },
-    ...(services.vehicle.enabled ? [{ href: "/vehicle-hire", label: "Vehicle hire" }] : []),
-    ...(services.hotel.enabled ? [{ href: "/hotels", label: "Hotels" }] : []),
-    ...(services.intercity.enabled ? [{ href: "/intercity", label: "Intercity" }] : []),
+    ...(bookings.length ? [{ href: bookings[0].href, label: "Bookings", children: bookings }] : []),
     { href: "/contact", label: "Contact" },
   ];
+  // The footer shows every link, one level.
+  const footerNav = nav.flatMap((n) => (n.children ? n.children.map((c) => ({ href: c.href, label: c.label })) : [{ href: n.href, label: n.label }]));
   const lines = site.contact.address.split("\n").map((l) => l.trim()).filter(Boolean);
   const landmark = lines.length > 2 ? `${lines[1]}, ${lines[2].split(",")[0]}` : (lines[0] ?? "");
   return (
@@ -52,7 +68,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         announcement={site.announcement}
       />
       <main id="main">{children}</main>
-      <Footer site={site} nav={nav} pages={pages} />
+      <Footer site={site} nav={footerNav} pages={pages} />
       <Suspense fallback={null}>
         <ScrollTopOnLoad />
       </Suspense>

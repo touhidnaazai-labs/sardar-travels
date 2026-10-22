@@ -56,3 +56,21 @@ The pictures printed on the brochure are generic stock images (the Ooty boating 
 ## Spelling corrections made in public copy
 
 Tippu → Tipu Sultan · Srigangapatna → Srirangapatna · Jaganmohana → Jaganmohan · Status of Mahiishasura → Mahishasura statue · Zoological Graden → Mysuru Zoo · Madhualai → Mudumalai · Cathrin Falls → Catherine Falls · 6yth Miles → 6th Mile · Mundh → Mund · Honemoon Delux → Honeymoon Deluxe · Silver Cascades → Silver Cascade Falls · Chettyar → Chettiar · Palini → Palani · Halebeedu/Beluru → Halebidu/Belur · Hoysleshwara/Shanthaleshwara → Hoysaleswara/Shantaleshwara · Abbi Fals → Abbey Falls · Kaveri Nisarga Dhama → Kaveri Nisargadhama · Channakeshava → Chennakeshava · Nanjanagud → Nanjangud · Gopalswamy → Gopalaswamy · Panchalingeswara → Panchalingeshwara · Madras → Chennai (Madras) · Coimbatour → Coimbatore.
+
+## Added 22 Oct 2026: travel services and national packages
+
+These were added from the owner's list. **No prices, schedules, availability or credentials were invented.** The pages are enquiry-based: customers send a request and staff reply with a quote.
+
+| Service | What the page says / does | To confirm |
+| --- | --- | --- |
+| **Train booking** (`/train-booking`) | Enquiry form (route, date, class, preferred train). States that availability and fares are not shown. | That Sardar Travels books train tickets, any service fee, and the process for confirming and paying. |
+| **Flight booking** (`/flight-booking`) | Enquiry form (route, dates, passengers, cabin, airline). States that fares are not shown. | That flights are booked, any service fee, and refund/change rules. |
+| **Visa assistance** (`/visa`) | Enquiry form (country, visa type, travel date, passport status). States that visa decisions belong to the embassy and approval can't be promised. | Which countries/visa types are handled, fees and any processing-time wording you want shown. |
+| **International packages** (`/international-packages`) | Enquiry form (countries, dates, budget, inclusions). No packages are listed because none were supplied. | Add real international packages in the dashboard (category "International packages") when ready. |
+| **National packages** (`/national-packages`) | Ten packages: Kashmir, Madurai, Rameshwaram, Kanyakumari, Munnar, Thekkady, Alleppey houseboat, Goa, Shimla, Delhi. Each lists well-known attractions from public sources, with "Customised" duration and "Price on request". | Real itineraries, durations, starting city, inclusions (travel, hotels, meals) and prices. Each tour carries an internal verification note. Kashmir's page asks staff to check current travel advisories. |
+
+Cancellation wording: the brochure's 50% / 24-hour rule is shown only on the original Mysuru-area tours. National and international packages say terms are stated in the quote, because the brochure doesn't cover them.
+
+The "Main tour" label on the home page marks **Mysuru Sightseeing**, the first tour in the list. Reorder tours in the dashboard if that should change.
+
+Photos for these pages are openly licensed Wikimedia Commons images (credited on `/credits`); replace them with the company's own in **Media**.

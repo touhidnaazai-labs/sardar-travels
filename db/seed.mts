@@ -11,16 +11,16 @@ import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
 import { scriptDb } from "./script-db";
 import { processImage } from "../src/lib/images";
-import { defaultHome, defaultServices, defaultSite } from "../src/lib/settings";
+import { defaultHome, defaultServices, defaultSite, mergeDefaults } from "../src/lib/settings";
 import {
-  BROCHURE_CANCELLATION,
+  cancellationFor,
   seedBusRoutes,
   seedDestinations,
   seedFaqs,
   seedHeroImages,
   seedImageAlts,
   seedPages,
-  seedTours,
+  allSeedTours as seedTours,
 } from "./seed-data";
 
 const { db, client, schema } = scriptDb();
@@ -102,7 +102,7 @@ async function main() {
         accommodation: t.accommodation ?? "",
         importantNotes: t.importantNotes ?? "",
         faqs: t.faqs ?? [],
-        cancellationPolicy: BROCHURE_CANCELLATION,
+        cancellationPolicy: cancellationFor(t.category),
         heroImageId: img[hero] ?? null,
         gallery: gallery.filter((g) => img[g.image]).map((g) => ({ mediaId: img[g.image], caption: g.caption })),
         sortOrder: i,
@@ -145,6 +145,18 @@ async function main() {
     },
   ];
   for (const s of settingsRows) await db.insert(schema.settings).values(s).onConflictDoNothing();
+
+  // Existing databases: give the newer services their default photos if none is set yet.
+  const [svc] = await db.select().from(schema.settings).where(eq(schema.settings.key, "services"));
+  if (svc) {
+    const merged = mergeDefaults(defaultServices, svc.value);
+    const want: Record<string, string> = { train: "train", flight: "flight", visa: "visa", international: "international" };
+    for (const [k, imgKey] of Object.entries(want)) {
+      const entry = merged[k as keyof typeof merged] as { imageId: string | null };
+      if (!entry.imageId && img[imgKey]) entry.imageId = img[imgKey];
+    }
+    await db.update(schema.settings).set({ value: merged, updatedAt: new Date() }).where(eq(schema.settings.key, "services"));
+  }
   console.log("✓ Settings");
 
   // First administrator

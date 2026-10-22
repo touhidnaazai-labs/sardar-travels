@@ -126,6 +126,8 @@ export const tourCategory = pgEnum("tour_category", [
   "wildlife-nature",
   "honeymoon",
   "waterfalls",
+  "national-package",
+  "international-package",
 ]);
 export const tourStyle = pgEnum("tour_style", ["private", "group", "private-or-group", "unconfirmed"]);
 export const availabilityMode = pgEnum("availability_mode", ["on-request", "daily", "scheduled"]);
@@ -281,7 +283,18 @@ export const enquiryStatus = pgEnum("enquiry_status", [
   "completed",
   "cancelled",
 ]);
-export const enquiryType = pgEnum("enquiry_type", ["tour", "planner", "vehicle", "hotel", "intercity", "general"]);
+export const enquiryType = pgEnum("enquiry_type", [
+  "tour",
+  "planner",
+  "vehicle",
+  "hotel",
+  "intercity",
+  "general",
+  "train",
+  "flight",
+  "visa",
+  "international",
+]);
 
 export const enquiries = pgTable(
   "enquiries",

@@ -77,6 +77,18 @@ export type ServicesSettings = {
     disclaimer: string;
     imageId: string | null;
   };
+  train: BookingService & { classOptions: string[] };
+  flight: BookingService & { cabinOptions: string[] };
+  visa: BookingService & { visaTypes: string[] };
+  international: BookingService;
+};
+
+/** Enquiry-based travel services that share one shape. */
+export type BookingService = {
+  enabled: boolean;
+  heading: string;
+  intro: string;
+  imageId: string | null;
 };
 
 export const HOME_SECTION_LABELS: Record<HomeSectionKey, string> = {
@@ -221,6 +233,37 @@ export const defaultServices: ServicesSettings = {
       "Daily overnight bus services to destinations across Karnataka, Maharashtra and the coast. Send a route enquiry and we’ll check seats and fares for you.",
     disclaimer:
       "Buses are run by independent operators. Sardar Travels does not own or operate these services. Schedules, fares and seats are confirmed only after we check with the operator.",
+    imageId: null,
+  },
+  train: {
+    enabled: true,
+    heading: "Train ticket booking",
+    intro:
+      "Tell us your route, date and class and we’ll help you book your train journey. We check availability and confirm with you before anything is booked. Seat availability and fares are not shown on this website.",
+    classOptions: ["Sleeper (SL)", "Third AC (3A)", "Second AC (2A)", "First AC (1A)", "AC Chair Car (CC)", "Executive Chair Car (EC)", "No preference"],
+    imageId: null,
+  },
+  flight: {
+    enabled: true,
+    heading: "Flight booking",
+    intro:
+      "Share where and when you want to fly and we’ll come back with options and fares. Nothing is booked until you confirm. Fares and seats are not shown on this website because they change constantly.",
+    cabinOptions: ["Economy", "Premium economy", "Business", "No preference"],
+    imageId: null,
+  },
+  visa: {
+    enabled: true,
+    heading: "Visa assistance",
+    intro:
+      "Travelling abroad? Tell us the country, visa type and your travel dates and we’ll guide you through the documents and the application. Visa decisions are made by the embassy or consulate, so we can’t promise approval or a processing time.",
+    visaTypes: ["Tourist", "Business", "Transit", "Other"],
+    imageId: null,
+  },
+  international: {
+    enabled: true,
+    heading: "International packages",
+    intro:
+      "Planning a holiday abroad? Tell us the country, dates and how many are travelling and we’ll put together an itinerary and a quote. Flights, hotels, transfers and visa help can be included on request.",
     imageId: null,
   },
 };

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 const DURATIONS: (FilterOption & { test: (d: number) => boolean })[] = [
-  { value: "1", label: "Day trips", test: (d) => d <= 1 },
+  { value: "1", label: "Day trips", test: (d) => d === 1 },
   { value: "2-3", label: "2–3 days", test: (d) => d >= 2 && d <= 3 },
   { value: "4+", label: "4 days or more", test: (d) => d >= 4 },
 ];

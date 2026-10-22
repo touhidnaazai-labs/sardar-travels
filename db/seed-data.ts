@@ -137,6 +137,96 @@ export const seedDestinations: SeedDestination[] = [
       "Talakadu's temples lie among sand dunes on the banks of the Kaveri, including those associated with the Panchalinga (five lingas).",
     image: "talakadu",
   },
+  {
+    slug: "kashmir",
+    name: "Kashmir",
+    region: "Jammu & Kashmir",
+    tagline: "Dal Lake, Mughal gardens and Himalayan meadows",
+    description:
+      "Srinagar’s Dal Lake with its shikaras and houseboats, the Mughal gardens, and day trips to Gulmarg, Pahalgam and Sonamarg make Kashmir a classic mountain holiday.",
+    image: "kashmir",
+  },
+  {
+    slug: "madurai",
+    name: "Madurai",
+    region: "Tamil Nadu",
+    tagline: "The temple city on the Vaigai",
+    description:
+      "Madurai is built around the Meenakshi Amman Temple, whose towering gopurams are covered in colourful sculpture. The Thirumalai Nayakkar Mahal and the old bazaars are close by.",
+    image: "madurai",
+  },
+  {
+    slug: "rameshwaram",
+    name: "Rameshwaram",
+    region: "Tamil Nadu",
+    tagline: "Island pilgrimage town and the Pamban Bridge",
+    description:
+      "Rameshwaram, on Pamban Island, is one of India’s major pilgrimage towns and home to the Ramanathaswamy Temple. The Pamban Bridge links the island to the mainland, and Dhanushkodi lies at its eastern tip.",
+    image: "rameshwaram",
+  },
+  {
+    slug: "kanyakumari",
+    name: "Kanyakumari",
+    region: "Tamil Nadu",
+    tagline: "Where three seas meet",
+    description:
+      "At India’s southern tip the Bay of Bengal, the Arabian Sea and the Indian Ocean meet. Kanyakumari is known for its sunrise and sunset views, the Vivekananda Rock Memorial and the Thiruvalluvar Statue.",
+    image: "kanyakumari",
+  },
+  {
+    slug: "munnar",
+    name: "Munnar",
+    region: "Kerala",
+    tagline: "Tea-covered hills of the Western Ghats",
+    description:
+      "Munnar is a hill station of rolling tea plantations, misty viewpoints and Eravikulam National Park.",
+    image: "munnar",
+  },
+  {
+    slug: "thekkady",
+    name: "Thekkady",
+    region: "Kerala",
+    tagline: "Periyar Lake and spice country",
+    description:
+      "Thekkady surrounds Periyar Lake and the Periyar Tiger Reserve, with boat trips, spice plantations and cardamom hills.",
+    image: "thekkady",
+  },
+  {
+    slug: "alleppey",
+    name: "Alleppey",
+    region: "Kerala",
+    tagline: "Kerala’s backwaters by houseboat",
+    description:
+      "Alappuzha (Alleppey) is the gateway to Kerala’s backwaters, best known for houseboat cruises through canals and lagoons past village life on the water.",
+    image: "alleppey",
+  },
+  {
+    slug: "goa",
+    name: "Goa",
+    region: "Goa",
+    tagline: "Beaches, forts and old churches",
+    description:
+      "Goa combines palm-fringed beaches with Portuguese-era churches and forts, such as the Basilica of Bom Jesus and Fort Aguada.",
+    image: "goa",
+  },
+  {
+    slug: "shimla",
+    name: "Shimla",
+    region: "Himachal Pradesh",
+    tagline: "Colonial hill station in the Himalayan foothills",
+    description:
+      "Shimla’s Ridge, Mall Road and Christ Church recall its days as a summer capital, with Kufri and Jakhu Hill close by.",
+    image: "shimla",
+  },
+  {
+    slug: "delhi",
+    name: "Delhi",
+    region: "Delhi",
+    tagline: "Mughal monuments and modern boulevards",
+    description:
+      "Delhi brings together the Red Fort, Humayun’s Tomb, Qutub Minar, India Gate and the lanes of Old Delhi.",
+    image: "delhi",
+  },
 ];
 
 export type SeedTour = {
@@ -749,6 +839,67 @@ export const seedTours: SeedTour[] = [
   },
 ];
 
+/** Cancellation wording by tour type. The brochure's 50%/24h rule covers the Mysuru-area day tours only. */
+export function cancellationFor(category: string) {
+  return category === "national-package" || category === "international-package"
+    ? "Cancellation terms for this package depend on the travel, hotels and dates you choose, and are stated in your quote before you accept it."
+    : BROCHURE_CANCELLATION;
+}
+
+const NATIONAL_NOTES =
+  "Added from the owner's list of national destinations (Oct 2026). The places listed are well-known attractions, not a confirmed itinerary. Confirm starting city, durations offered, inclusions (travel, hotels, meals) and prices before relying on this page.";
+
+function nationalTour(t: {
+  slug: string; code: string; title: string; subtitle: string; summary: string; overview: string;
+  stops: string[]; image: string; destination: string; note?: string; important?: string;
+}): SeedTour {
+  return {
+    slug: t.slug,
+    code: t.code,
+    title: t.title,
+    subtitle: t.subtitle,
+    category: "national-package",
+    durationDays: 0,
+    durationNights: 0,
+    durationLabel: "Customised",
+    summary: t.summary,
+    overview: t.overview + "\n\nThe number of days, hotels and sightseeing are planned around you — tell us your dates, group size and starting city and we’ll send a day-by-day plan with a clear quote.",
+    startPoint: "",
+    departureTime: "",
+    departureNotes: "We plan from your city. Tell us where you’ll be starting and we’ll include travel to and from the destination in your quote.",
+    itinerary: [{ day: 1, title: "Popular places we can include", summary: "Your day-by-day plan is tailored to your dates in your quote.", stops: t.stops.map((name) => ({ name })) }],
+    inclusions: ["An itinerary planned around your dates and group"],
+    exclusions: [
+      "Travel to and from the destination unless listed in your quote",
+      "Hotels, meals, entry fees and activities unless listed in your quote",
+      "Personal expenses and shopping",
+    ],
+    importantNotes: t.important,
+    destinations: [t.destination],
+    hero: t.image,
+    gallery: [{ image: t.image, caption: t.title.replace(" Package", "") }],
+    featured: false,
+    published: true,
+    verificationNotes: NATIONAL_NOTES + (t.note ? " " + t.note : ""),
+  };
+}
+
+export const nationalTours: SeedTour[] = [
+  nationalTour({ slug: "kashmir-package", code: "N1", title: "Kashmir Package", subtitle: "Dal Lake, Gulmarg, Pahalgam and Sonamarg", summary: "Shikara rides on Dal Lake, the Mughal gardens of Srinagar and day trips to Gulmarg, Pahalgam and Sonamarg.", overview: "Kashmir is a valley of lakes, gardens and snow-fringed meadows. A typical trip is based in Srinagar on or beside Dal Lake, with day excursions to the meadows and mountain resorts around it.", stops: ["Dal Lake shikara ride", "Houseboat stay on Dal Lake (optional)", "Mughal gardens — Shalimar Bagh and Nishat Bagh", "Gulmarg", "Pahalgam", "Sonamarg"], image: "kashmir", destination: "kashmir", important: "Travel conditions and the best season to visit can change, so we confirm the current situation when you enquire.", note: "Check current travel advisories before quoting." }),
+  nationalTour({ slug: "madurai-package", code: "N2", title: "Madurai Package", subtitle: "The Meenakshi Amman Temple and the old city", summary: "The Meenakshi Amman Temple, the Thirumalai Nayakkar Mahal and the old bazaars of Madurai.", overview: "Madurai is one of South India’s oldest temple cities, built around the Meenakshi Amman Temple and its towering sculpted gopurams.", stops: ["Meenakshi Amman Temple", "Thirumalai Nayakkar Mahal", "Gandhi Memorial Museum", "Old city bazaars"], image: "madurai", destination: "madurai", important: "Temples have dress codes and fixed darshan timings; we plan around them." }),
+  nationalTour({ slug: "rameshwaram-package", code: "N3", title: "Rameshwaram Package", subtitle: "Ramanathaswamy Temple, Pamban Bridge and Dhanushkodi", summary: "Darshan at the Ramanathaswamy Temple, the Pamban Bridge and the island’s eastern tip at Dhanushkodi.", overview: "Rameshwaram, on Pamban Island, is a major pilgrimage destination. The Ramanathaswamy Temple is known for its long pillared corridors and its sacred theerthams.", stops: ["Ramanathaswamy Temple", "Agni Theertham", "Pamban Bridge", "Dhanushkodi"], image: "rameshwaram", destination: "rameshwaram", important: "Temple timings and dress codes apply." }),
+  nationalTour({ slug: "kanyakumari-package", code: "N4", title: "Kanyakumari Package", subtitle: "Sunrise at India’s southern tip", summary: "Sunrise and sunset views, the Vivekananda Rock Memorial, the Thiruvalluvar Statue and the Kumari Amman Temple.", overview: "Kanyakumari sits where the Bay of Bengal, the Arabian Sea and the Indian Ocean meet. Visitors come for the sunrise and sunset views and the memorials just off the shore.", stops: ["Sunrise point", "Vivekananda Rock Memorial", "Thiruvalluvar Statue", "Kumari Amman Temple", "Sunset point"], image: "kanyakumari", destination: "kanyakumari", important: "Ferry services to the rock memorials depend on weather and sea conditions." }),
+  nationalTour({ slug: "munnar-package", code: "N5", title: "Munnar Package", subtitle: "Tea hills and misty viewpoints", summary: "Tea plantations, Mattupetty Dam, Echo Point and Eravikulam National Park in the Western Ghats.", overview: "Munnar is a Kerala hill station set among rolling tea plantations, with viewpoints, lakes and the grasslands of Eravikulam National Park.", stops: ["Tea plantations", "Eravikulam National Park", "Mattupetty Dam", "Echo Point", "Top Station"], image: "munnar", destination: "munnar", important: "Eravikulam National Park can close for part of the year; we confirm before planning." }),
+  nationalTour({ slug: "thekkady-package", code: "N6", title: "Thekkady Package", subtitle: "Periyar Lake and spice plantations", summary: "Boating on Periyar Lake, spice plantation visits and a cultural performance in Thekkady.", overview: "Thekkady is centred on Periyar Lake and the Periyar Tiger Reserve, surrounded by spice and cardamom hills.", stops: ["Periyar Lake boating", "Spice plantation visit", "Kerala cultural performance (optional)"], image: "thekkady", destination: "thekkady", important: "Wildlife sightings cannot be guaranteed. Boating and forest entry are subject to Periyar Tiger Reserve rules and timings." }),
+  nationalTour({ slug: "alleppey-houseboat-package", code: "N7", title: "Alleppey Houseboat Package", subtitle: "Cruising Kerala’s backwaters", summary: "A houseboat cruise through the canals and lagoons of the Kerala backwaters from Alappuzha.", overview: "Alleppey (Alappuzha) is the starting point for Kerala’s famous houseboat cruises, drifting past paddy fields, coconut groves and village life.", stops: ["Houseboat cruise on the backwaters", "Vembanad Lake", "Village life along the canals", "Alappuzha Beach"], image: "alleppey", destination: "alleppey", important: "Houseboat categories, meals and overnight options are confirmed in your quote." }),
+  nationalTour({ slug: "goa-package", code: "N8", title: "Goa Package", subtitle: "Beaches, forts and old churches", summary: "Beaches, the Basilica of Bom Jesus, Fort Aguada and the churches of Old Goa.", overview: "Goa pairs palm-fringed beaches with Portuguese-era churches, forts and markets.", stops: ["Calangute and Baga beaches", "Fort Aguada", "Basilica of Bom Jesus, Old Goa", "Old Goa churches", "Palolem Beach"], image: "goa", destination: "goa" }),
+  nationalTour({ slug: "shimla-package", code: "N9", title: "Shimla Package", subtitle: "Colonial charm in the Himalayan foothills", summary: "The Ridge, Mall Road, Christ Church, Jakhu Temple and Kufri in the hills of Himachal Pradesh.", overview: "Shimla was the British summer capital and still has a colonial-era Mall Road and Ridge, with pine forests and Himalayan views.", stops: ["The Ridge", "Mall Road", "Christ Church", "Jakhu Temple", "Kufri"], image: "shimla", destination: "shimla" }),
+  nationalTour({ slug: "delhi-package", code: "N10", title: "Delhi Package", subtitle: "Mughal monuments and the capital’s landmarks", summary: "The Red Fort, Humayun’s Tomb, Qutub Minar, India Gate and the lanes of Old Delhi.", overview: "Delhi layers centuries of history, from the Qutub complex and Mughal tombs and forts to the avenues of New Delhi.", stops: ["Red Fort", "Jama Masjid and Old Delhi", "Humayun’s Tomb", "Qutub Minar", "India Gate", "Lotus Temple"], image: "delhi", destination: "delhi", important: "Monument opening days and timings vary; we plan around them." }),
+];
+
+// Order matters: the original Mysuru tours keep the lowest sort positions.
+export const allSeedTours: SeedTour[] = [...seedTours, ...nationalTours];
+
 export const seedFaqs: { question: string; answer: string; topic: string; showOnHome: boolean }[] = [
   {
     topic: "booking",
@@ -918,6 +1069,21 @@ export const seedBusRoutes: { operator: string; destination: string }[] = [
 /** Image keys used for site-wide imagery. */
 export const seedHeroImages = ["mysore-palace", "nilgiri-tea", "abbey-falls", "kodai-view"];
 export const seedImageAlts: Record<string, string> = {
+  kashmir: "A shikara on the still waters of Dal Lake, Kashmir",
+  madurai: "Colourful sculpted gopuram of the Meenakshi Amman Temple, Madurai",
+  rameshwaram: "A train crossing the Pamban Bridge over turquoise water, Rameshwaram",
+  kanyakumari: "The Vivekananda Rock Memorial off Kanyakumari",
+  munnar: "Tea-covered hills near Munnar",
+  thekkady: "Hills reflected in Periyar Lake, Thekkady",
+  alleppey: "A houseboat on the backwaters of Alleppey, Kerala",
+  goa: "Palm trees above a beach in Goa",
+  shimla: "The Ridge and Christ Church, Shimla",
+  delhi: "India Gate, New Delhi",
+  flight: "Aircraft wing above the clouds",
+  train: "An Indian Railways train",
+  visa: "An Indian passport",
+  international: "The Eiffel Tower in Paris",
+
   "mysore-palace": "Mysuru Palace with its domes against a blue sky",
   chamundi: "Gopuram of the Chamundeshwari Temple on Chamundi Hill",
   nandi: "The monolithic Nandi statue on Chamundi Hill",

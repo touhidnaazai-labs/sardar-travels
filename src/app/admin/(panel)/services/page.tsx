@@ -24,7 +24,7 @@ export default async function ServicesAdmin() {
 
   return (
     <>
-      <PageHeader title="Services & vehicles" description="Configure vehicle hire, hotel reservation enquiries and the optional intercity bus module." />
+      <PageHeader title="Services & vehicles" description="Configure vehicle hire, hotels, train, flight, visa and international package enquiries, and the optional intercity bus module." />
 
       <AdminForm action={saveServicesSettings} className="space-y-6">
         <Card title="Vehicle hire">
@@ -47,6 +47,45 @@ export default async function ServicesAdmin() {
             <TextArea name="hotel.destinations" label="Destinations (one per line)" defaultValue={svc.hotel.destinations.join("\n")} rows={4} />
             <TextArea name="hotel.budgetOptions" label="Budget options (one per line)" defaultValue={svc.hotel.budgetOptions.join("\n")} rows={4} />
             <div className="md:col-span-2"><ImagePicker name="hotel.imageId" label="Image" media={media} value={svc.hotel.imageId} /></div>
+          </div>
+        </Card>
+        <Card title="Train ticket booking">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2"><Toggle name="train.enabled" label="Accept train booking enquiries" defaultChecked={svc.train.enabled} /></div>
+            <TextField name="train.heading" label="Page heading" defaultValue={svc.train.heading} />
+            <div />
+            <TextArea name="train.intro" label="Introduction" defaultValue={svc.train.intro} rows={3} className="md:col-span-2" />
+            <TextArea name="train.classOptions" label="Classes customers can request (one per line)" defaultValue={svc.train.classOptions.join("\n")} rows={4} help="Preferences in the form, not a claim of availability." className="md:col-span-2" />
+            <div className="md:col-span-2"><ImagePicker name="train.imageId" label="Image" media={media} value={svc.train.imageId} /></div>
+          </div>
+        </Card>
+        <Card title="Flight booking">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2"><Toggle name="flight.enabled" label="Accept flight booking enquiries" defaultChecked={svc.flight.enabled} /></div>
+            <TextField name="flight.heading" label="Page heading" defaultValue={svc.flight.heading} />
+            <div />
+            <TextArea name="flight.intro" label="Introduction" defaultValue={svc.flight.intro} rows={3} className="md:col-span-2" />
+            <TextArea name="flight.cabinOptions" label="Cabin options (one per line)" defaultValue={svc.flight.cabinOptions.join("\n")} rows={4} help="Preferences in the form, not a claim of availability." className="md:col-span-2" />
+            <div className="md:col-span-2"><ImagePicker name="flight.imageId" label="Image" media={media} value={svc.flight.imageId} /></div>
+          </div>
+        </Card>
+        <Card title="Visa assistance">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2"><Toggle name="visa.enabled" label="Accept visa assistance enquiries" defaultChecked={svc.visa.enabled} /></div>
+            <TextField name="visa.heading" label="Page heading" defaultValue={svc.visa.heading} />
+            <div />
+            <TextArea name="visa.intro" label="Introduction" defaultValue={svc.visa.intro} rows={3} className="md:col-span-2" />
+            <TextArea name="visa.visaTypes" label="Visa types (one per line)" defaultValue={svc.visa.visaTypes.join("\n")} rows={4} help="Shown as choices in the enquiry form." className="md:col-span-2" />
+            <div className="md:col-span-2"><ImagePicker name="visa.imageId" label="Image" media={media} value={svc.visa.imageId} /></div>
+          </div>
+        </Card>
+        <Card title="International packages">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2"><Toggle name="international.enabled" label="Accept international package enquiries" defaultChecked={svc.international.enabled} /></div>
+            <TextField name="international.heading" label="Page heading" defaultValue={svc.international.heading} />
+            <div />
+            <TextArea name="international.intro" label="Introduction" defaultValue={svc.international.intro} rows={3} className="md:col-span-2" />
+            <div className="md:col-span-2"><ImagePicker name="international.imageId" label="Image" media={media} value={svc.international.imageId} /></div>
           </div>
         </Card>
         <Card title="Intercity bus module" description="Only enable this if the business confirms it arranges these services. Operators are shown as independent, never as Sardar Travels-owned.">

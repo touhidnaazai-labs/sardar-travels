@@ -62,7 +62,7 @@ export function EnquiryWizard({
   tone = "light",
   note,
 }: {
-  type: "tour" | "planner" | "vehicle" | "hotel" | "intercity" | "general";
+  type: "tour" | "planner" | "vehicle" | "hotel" | "intercity" | "general" | "train" | "flight" | "visa" | "international";
   tourId?: string;
   subject?: string;
   tripFields: FieldDef[];
@@ -96,7 +96,9 @@ export function EnquiryWizard({
   const allFields = useMemo(() => steps.flatMap((s) => s.fields), [steps]);
 
   const [values, setValues] = useState<Record<string, string>>(() => {
-    const init: Record<string, string> = { preferredContact: "phone", adults: "2", children: "0", d_rooms: "1" };
+    const init: Record<string, string> = { preferredContact: "phone", adults: "2", children: "0" };
+    // Only forms that actually ask for rooms (hotels) default it to 1.
+    if (allFields.some((f) => f.name === "rooms" && f.detail)) init.d_rooms = "1";
     for (const f of allFields) if (f.kind === "select" && f.required && f.options?.length === 1) init[fieldKey(f)] = optValue(f.options[0]);
     return { ...init, ...defaults };
   });

@@ -90,6 +90,16 @@ export async function saveHomeSettings(_prev: ActionResult, fd: FormData): Promi
   return { ok: true, message: "Homepage updated." };
 }
 
+/** Shared fields of the enquiry-based travel services. */
+function booking(fd: FormData, key: string, cur: { heading: string }) {
+  return {
+    enabled: b(fd, `${key}.enabled`),
+    heading: s(fd, `${key}.heading`) || cur.heading,
+    intro: s(fd, `${key}.intro`),
+    imageId: mediaId(s(fd, `${key}.imageId`)),
+  };
+}
+
 export async function saveServicesSettings(_prev: ActionResult, fd: FormData): Promise<ActionResult> {
   await requireUser("admin");
   const cur = await getServicesSettings();
@@ -117,6 +127,10 @@ export async function saveServicesSettings(_prev: ActionResult, fd: FormData): P
       disclaimer: s(fd, "intercity.disclaimer") || cur.intercity.disclaimer,
       imageId: mediaId(s(fd, "intercity.imageId")),
     },
+    train: { ...booking(fd, "train", cur.train), classOptions: lines(fd, "train.classOptions") },
+    flight: { ...booking(fd, "flight", cur.flight), cabinOptions: lines(fd, "flight.cabinOptions") },
+    visa: { ...booking(fd, "visa", cur.visa), visaTypes: lines(fd, "visa.visaTypes") },
+    international: booking(fd, "international", cur.international),
   };
   if (next.hotel.enabled && !next.hotel.destinations.length) return fail("Add at least one hotel destination.", { "hotel.destinations": "Required" });
   await put("services", next);

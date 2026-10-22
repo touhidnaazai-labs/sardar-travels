@@ -66,3 +66,53 @@ export function intercityFields(routes: { operator: string; destination: string 
     { name: "berth", label: "Seat preference", kind: "select", detail: true, width: "full", options: ["Sleeper", "Semi-sleeper / seater", "No preference"], placeholder: "No preference" },
   ];
 }
+
+export function trainFields(s: ServicesSettings["train"]): FieldDef[] {
+  return [
+    { name: "pickup", label: "From", kind: "text", required: true, width: "half", placeholder: "Departure city or station" },
+    { name: "destination", label: "To", kind: "text", required: true, width: "half", placeholder: "Arrival city or station" },
+    { name: "travelDate", label: "Journey date", kind: "date", required: true, width: "half" },
+    { name: "returnDate", label: "Return date", kind: "date", width: "half", after: "travelDate", help: "Leave blank for one way" },
+    { name: "adults", label: "Passengers", kind: "number", min: 1, max: 99, required: true, width: "third" },
+    { name: "children", label: "Children (under 12)", kind: "number", min: 0, max: 60, width: "third" },
+    { name: "trainClass", label: "Class", kind: "select", detail: true, width: "third", options: s.classOptions, placeholder: "No preference" },
+    { name: "preferredTrain", label: "Preferred train (name or number)", kind: "text", detail: true, width: "full", placeholder: "Optional — if you already know it", help: "We confirm availability before anything is booked." },
+  ];
+}
+
+export function flightFields(s: ServicesSettings["flight"]): FieldDef[] {
+  return [
+    { name: "tripType", label: "Trip", kind: "choice", detail: true, width: "full", options: ["One way", "Return"] },
+    { name: "pickup", label: "From", kind: "text", required: true, width: "half", placeholder: "City or airport" },
+    { name: "destination", label: "To", kind: "text", required: true, width: "half", placeholder: "City or airport" },
+    { name: "travelDate", label: "Departure date", kind: "date", required: true, width: "half" },
+    { name: "returnDate", label: "Return date", kind: "date", width: "half", after: "travelDate", help: "Needed for return trips" },
+    { name: "adults", label: "Adults", kind: "number", min: 1, max: 99, required: true, width: "third" },
+    { name: "children", label: "Children", kind: "number", min: 0, max: 60, width: "third" },
+    { name: "cabin", label: "Cabin", kind: "select", detail: true, width: "third", options: s.cabinOptions, placeholder: "No preference" },
+    { name: "airline", label: "Airline preference", kind: "text", detail: true, width: "full", placeholder: "Optional" },
+  ];
+}
+
+export function visaFields(s: ServicesSettings["visa"]): FieldDef[] {
+  return [
+    { name: "destination", label: "Country you’re visiting", kind: "text", required: true, width: "half", placeholder: "e.g. Singapore" },
+    { name: "visaType", label: "Visa type", kind: "select", detail: true, required: true, width: "half", options: s.visaTypes, placeholder: "Select…" },
+    { name: "travelDate", label: "Planned travel date", kind: "date", width: "half" },
+    { name: "adults", label: "Number of travellers", kind: "number", min: 1, max: 99, required: true, width: "half" },
+    { name: "passport", label: "Passport", kind: "select", detail: true, width: "full", options: ["Valid for more than 6 months", "Valid for less than 6 months", "I don’t have a passport yet"], placeholder: "Select…", help: "Most countries need a passport valid for at least 6 months." },
+    { name: "notes", label: "Anything else we should know?", kind: "textarea", detail: true, width: "full", placeholder: "Earlier visa refusals, purpose of visit, nationality if not Indian…" },
+  ];
+}
+
+export function internationalFields(): FieldDef[] {
+  return [
+    { name: "destination", label: "Country or countries", kind: "text", required: true, width: "full", placeholder: "e.g. Dubai, Singapore, Thailand" },
+    { name: "travelDate", label: "Preferred travel date", kind: "date", required: true, width: "half" },
+    { name: "returnDate", label: "Return date", kind: "date", width: "half", after: "travelDate" },
+    { name: "adults", label: "Adults", kind: "number", min: 1, max: 99, required: true, width: "third" },
+    { name: "children", label: "Children", kind: "number", min: 0, max: 60, width: "third" },
+    { name: "budget", label: "Budget level", kind: "select", detail: true, width: "third", options: ["Budget", "Mid-range", "Premium", "Luxury", "Flexible"], placeholder: "Select…" },
+    { name: "include", label: "What should the package include?", kind: "textarea", detail: true, width: "full", placeholder: "Flights, hotels, sightseeing, visa help, airport transfers…" },
+  ];
+}

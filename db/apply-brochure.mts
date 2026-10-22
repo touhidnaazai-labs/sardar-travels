@@ -10,7 +10,7 @@
  */
 import { eq } from "drizzle-orm";
 import { scriptDb } from "./script-db";
-import { BROCHURE_CANCELLATION, seedFaqs, seedPages, seedTours } from "./seed-data";
+import { allSeedTours as seedTours, cancellationFor, seedFaqs, seedPages } from "./seed-data";
 import { defaultServices, mergeDefaults } from "../src/lib/settings";
 
 if (!process.argv.includes("--yes")) {
@@ -36,7 +36,7 @@ for (const [i, t] of seedTours.entries()) {
     accommodation: t.accommodation ?? "",
     importantNotes: t.importantNotes ?? "",
     faqs: t.faqs ?? [],
-    cancellationPolicy: BROCHURE_CANCELLATION,
+    cancellationPolicy: cancellationFor(t.category),
     heroImageId: img[hero] ?? null,
     gallery: gallery.filter((g) => img[g.image]).map((g) => ({ mediaId: img[g.image], caption: g.caption })),
     sortOrder: i,

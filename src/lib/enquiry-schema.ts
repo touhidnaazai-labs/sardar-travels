@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ENQUIRY_TYPES = ["tour", "planner", "vehicle", "hotel", "intercity", "general"] as const;
+export const ENQUIRY_TYPES = ["tour", "planner", "vehicle", "hotel", "intercity", "general", "train", "flight", "visa", "international"] as const;
 
 export const STATUS_LABELS = {
   new: "New enquiry",
@@ -19,6 +19,10 @@ export const TYPE_LABELS = {
   hotel: "Hotel reservation",
   intercity: "Intercity bus",
   general: "General enquiry",
+  train: "Train booking",
+  flight: "Flight booking",
+  visa: "Visa assistance",
+  international: "International package",
 } as const;
 
 /** What the customer sees for each status on the tracking page. */
@@ -80,6 +84,15 @@ export const enquirySchema = z
     }
     if (v.type === "tour" && !v.tourId) {
       ctx.addIssue({ code: "custom", path: ["tourId"], message: "Please choose a tour" });
+    }
+    if ((v.type === "train" || v.type === "flight") && !v.pickup) {
+      ctx.addIssue({ code: "custom", path: ["pickup"], message: "Where are you travelling from?" });
+    }
+    if ((v.type === "train" || v.type === "flight") && !v.destination) {
+      ctx.addIssue({ code: "custom", path: ["destination"], message: "Where are you travelling to?" });
+    }
+    if ((v.type === "visa" || v.type === "international") && !v.destination) {
+      ctx.addIssue({ code: "custom", path: ["destination"], message: v.type === "visa" ? "Which country do you need a visa for?" : "Which country would you like to visit?" });
     }
     if ((v.type === "vehicle" || v.type === "intercity") && !v.destination) {
       ctx.addIssue({ code: "custom", path: ["destination"], message: "Where would you like to go?" });

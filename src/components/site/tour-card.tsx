@@ -45,7 +45,7 @@ export function TourCard({
       <Link href={`/tours/${tour.slug}`} className={cn("group relative isolate flex min-h-[28rem] flex-col justify-end overflow-hidden rounded-3xl bg-ink text-white", className)}>
         <MediaImage media={img} sizes="(min-width: 1024px) 55vw, 100vw" className="-z-10 transition-transform duration-[1.4s] ease-[var(--ease-out-expo)] group-hover:scale-105" priority={priority} />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(9,17,38,.1)_25%,rgba(9,17,38,.9))]" />
-        <span className="absolute top-5 left-5 rounded-full bg-accent px-3.5 py-1 text-xs font-bold text-ink">Most booked route</span>
+        <span className="absolute top-5 left-5 rounded-full bg-accent px-3.5 py-1 text-xs font-bold text-ink">Main tour</span>
         <span className="absolute top-5 right-5 grid size-11 place-items-center rounded-full bg-white text-ink transition-transform group-hover:rotate-45"><ArrowUpRight className="size-5" aria-hidden /></span>
         <div className="p-7 md:p-9">
           <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur"><Clock className="size-3.5" aria-hidden /> {durationText(tour)}</p>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Bus, Car, Hotel, Map, MapPin, MessageCircle, Phone, PhoneCall, ReceiptText, Route, ShieldCheck, Star } from "lucide-react";
+import { ArrowRight, BadgeCheck, Bus, Car, Compass, Globe, Hotel, Map, MapPin, MessageCircle, Phone, PhoneCall, Plane, ReceiptText, Route, ShieldCheck, Star, Stamp, TrainFront } from "lucide-react";
 import { Hero } from "@/components/home/hero";
 import { QuickQuote } from "@/components/forms/quick-quote";
 import { AccentText } from "@/components/site/accent-text";
@@ -43,8 +43,8 @@ export default async function HomePage() {
   const wa = c.whatsapp ? whatsappLink(c.whatsapp, "Hello Sardar Travels, I'd like to plan a trip.") : "";
   const landmark = c.address.split("\n").find((l) => /opp\.|near|behind/i.test(l));
 
-  const featured = tours.filter((t) => t.featured);
-  const popular = (featured.length >= 3 ? featured : tours).slice(0, 6);
+  const featured = tours.filter((t) => t.featured && t.category !== "national-package");
+  const popular = (featured.length >= 3 ? featured : tours.filter((t) => t.category !== "national-package")).slice(0, 6);
   const more = tours.filter((t) => !popular.some((p) => p.id === t.id));
 
   const chips = ["Pickup & drop complimentary", "No payment to enquire", "50% refund if cancelled 24 hrs before", ...(landmark ? [`Office ${landmark.trim()}`] : [])];
@@ -52,6 +52,10 @@ export default async function HomePage() {
     ...tours.map((t) => ({ value: t.id, label: t.title, tourId: t.id })),
     ...(services.vehicle.enabled ? [{ value: "vehicle", label: "Vehicle / cab hire" }] : []),
     ...(services.hotel.enabled ? [{ value: "hotel", label: "Hotel booking" }] : []),
+    ...(services.flight.enabled ? [{ value: "flight", label: "Flight booking" }] : []),
+    ...(services.train.enabled ? [{ value: "train", label: "Train booking" }] : []),
+    ...(services.visa.enabled ? [{ value: "visa", label: "Visa assistance" }] : []),
+    ...(services.international.enabled ? [{ value: "international", label: "International package" }] : []),
     { value: "custom", label: "A custom holiday" },
   ];
 
@@ -134,19 +138,43 @@ export default async function HomePage() {
         </section>
       ),
 
-    tours: () =>
-      more.length > 0 && (
-        <section key="tours" className="py-16 md:py-24">
-          <div className="container-x">
-            <SectionHeading eyebrow={home.tours.eyebrow} title={home.tours.heading} intro={home.tours.intro} />
-            <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {more.map((t, i) => (
-                <Reveal as="li" key={t.id} delay={(i % 3) * 0.06}><TourCard tour={t} media={media} /></Reveal>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ),
+    tours: () => {
+      const local = more.filter((t) => t.category !== "national-package" && t.category !== "international-package");
+      const national = tours.filter((t) => t.category === "national-package");
+      return (
+        (local.length > 0 || national.length > 0) && (
+          <section key="tours" className="py-16 md:py-24">
+            <div className="container-x space-y-20">
+              {local.length > 0 && (
+                <div>
+                  <SectionHeading eyebrow={home.tours.eyebrow} title={home.tours.heading} intro={home.tours.intro} />
+                  <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {local.map((t, i) => (
+                      <Reveal as="li" key={t.id} delay={(i % 3) * 0.06}><TourCard tour={t} media={media} /></Reveal>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {national.length > 0 && (
+                <div>
+                  <SectionHeading
+                    eyebrow="Across India"
+                    title="National *tour packages*"
+                    intro="Kashmir, Goa, Kerala, Himachal, Delhi and the temple towns of Tamil Nadu — planned around your dates and group."
+                    action={<Link href="/national-packages" className="btn btn-ghost">All national packages <ArrowRight className="size-4" aria-hidden /></Link>}
+                  />
+                  <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {national.slice(0, 6).map((t, i) => (
+                      <Reveal as="li" key={t.id} delay={(i % 3) * 0.06}><TourCard tour={t} media={media} /></Reveal>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </section>
+        )
+      );
+    },
 
     destinations: () =>
       destinations.length > 0 && (
@@ -176,22 +204,39 @@ export default async function HomePage() {
         </section>
       ),
 
-    services: () => (
-      <section key="services" className="bg-ivory py-16 md:py-24">
-        <div className="container-x">
-          <SectionHeading eyebrow={home.services.eyebrow} title={home.services.heading} intro={home.services.intro} />
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            <ServiceCard href="/tours" icon={Map} title="Tour packages" body="Day trips and holidays across Mysuru, Ooty, Kodaikanal, Coorg and the Hoysala temple towns." points={[`${tours.length} ready-made itineraries`, "Stops and timing can be adjusted"]} media={home.hero.imageIds[0] ? media[home.hero.imageIds[0]] : undefined} cta="Browse tours" />
-            {services.vehicle.enabled && (
-              <ServiceCard href="/vehicle-hire" icon={Car} title={services.vehicle.heading} body={services.vehicle.intro} points={[`In ${services.vehicle.serviceAreas.join(", ")}`, "Drop, local or multi-day"]} media={services.vehicle.imageId ? media[services.vehicle.imageId] : undefined} cta="Request a vehicle" />
-            )}
-            {services.hotel.enabled && (
-              <ServiceCard href="/hotels" icon={Hotel} title={services.hotel.heading} body={services.hotel.intro} points={[`In ${services.hotel.destinations.join(", ")}`, "Options for every budget"]} media={services.hotel.imageId ? media[services.hotel.imageId] : undefined} cta="Find a hotel" />
-            )}
+    services: () => {
+      const nationalHero = tours.find((t) => t.category === "national-package")?.heroImageId;
+      const tiles = [
+        { href: "/tours", title: "Mysuru & local tours", body: "Palaces, hill stations, temples and waterfalls", icon: Map, img: home.hero.imageIds[0] },
+        { href: "/national-packages", title: "National packages", body: "Kashmir, Goa, Kerala, Shimla, Delhi & more", icon: Compass, img: nationalHero },
+        ...(services.international.enabled ? [{ href: "/international-packages", title: services.international.heading, body: "Holidays abroad, planned for you", icon: Globe, img: services.international.imageId }] : []),
+        ...(services.flight.enabled ? [{ href: "/flight-booking", title: services.flight.heading, body: "Domestic and international flights", icon: Plane, img: services.flight.imageId }] : []),
+        ...(services.train.enabled ? [{ href: "/train-booking", title: services.train.heading, body: "Help booking your train journey", icon: TrainFront, img: services.train.imageId }] : []),
+        ...(services.visa.enabled ? [{ href: "/visa", title: services.visa.heading, body: "Documents and applications, guided", icon: Stamp, img: services.visa.imageId }] : []),
+        ...(services.vehicle.enabled ? [{ href: "/vehicle-hire", title: services.vehicle.heading, body: `In ${services.vehicle.serviceAreas.join(", ")}`, icon: Car, img: services.vehicle.imageId }] : []),
+        ...(services.hotel.enabled ? [{ href: "/hotels", title: services.hotel.heading, body: `In ${services.hotel.destinations.join(", ")}`, icon: Hotel, img: services.hotel.imageId }] : []),
+      ];
+      return (
+        <section key="services" className="bg-ivory py-16 md:py-24">
+          <div className="container-x">
+            <SectionHeading eyebrow={home.services.eyebrow} title={home.services.heading} intro={home.services.intro} />
+            <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+              {tiles.map((t, i) => (
+                <Reveal as="li" key={t.href} delay={(i % 4) * 0.05}>
+                  <Link href={t.href} className="group relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-2xl bg-ink p-4 text-white md:aspect-[4/3] md:p-5">
+                    <MediaImage media={t.img ? media[t.img] : undefined} sizes="(min-width: 768px) 25vw, 50vw" className="-z-10 transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(9,17,38,.05)_30%,rgba(9,17,38,.88))]" />
+                    <span className="absolute top-3 left-3 grid size-9 place-items-center rounded-lg bg-white text-ink md:top-4 md:left-4"><t.icon className="size-[1.15rem]" aria-hidden /></span>
+                    <p className="text-lg leading-tight font-semibold md:text-xl">{t.title}</p>
+                    <p className="mt-1 text-xs leading-snug text-white/75 md:text-sm">{t.body}</p>
+                  </Link>
+                </Reveal>
+              ))}
+            </ul>
           </div>
-        </div>
-      </section>
-    ),
+        </section>
+      );
+    },
 
     intercity: () =>
       services.intercity.enabled &&
@@ -321,27 +366,4 @@ export default async function HomePage() {
   };
 
   return <>{home.sections.filter((s) => s.enabled).map((s) => sections[s.key]())}</>;
-}
-
-function ServiceCard({
-  href, icon: Icon, title, body, points, media, cta,
-}: { href: string; icon: typeof Car; title: string; body: string; points: string[]; media: Parameters<typeof MediaImage>[0]["media"]; cta: string }) {
-  return (
-    <Reveal>
-      <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white transition-shadow hover:shadow-[0_24px_60px_-30px_rgba(15,28,58,.5)]">
-        <div className="relative aspect-[16/10] overflow-hidden bg-sand">
-          <MediaImage media={media} sizes="(min-width: 768px) 33vw, 100vw" className="transition-transform duration-700 group-hover:scale-105" />
-          <span className="absolute bottom-3 left-3 grid size-11 place-items-center rounded-xl bg-white text-ink"><Icon className="size-5" aria-hidden /></span>
-        </div>
-        <div className="flex flex-1 flex-col p-6">
-          <h3 className="text-2xl font-semibold">{title}</h3>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
-          <ul className="mt-4 mb-5 space-y-1.5 text-sm">
-            {points.map((p) => <li key={p} className="flex gap-2"><BadgeCheck className="mt-0.5 size-4 shrink-0 text-forest" aria-hidden /> {p}</li>)}
-          </ul>
-          <span className="mt-auto inline-flex items-center gap-1.5 font-bold text-forest">{cta} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></span>
-        </div>
-      </Link>
-    </Reveal>
-  );
 }

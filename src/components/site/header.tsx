@@ -5,13 +5,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Menu, MessageCircle, Phone, X } from "lucide-react";
+import { ChevronDown, Menu, MessageCircle, Phone, X } from "lucide-react";
 import type { MediaMeta } from "@/lib/data";
 import { cn, phoneDigits, whatsappLink } from "@/lib/utils";
 import { HomeLink } from "./home-link";
 import { Logo } from "./logo";
 
-export type NavItem = { href: string; label: string };
+export type NavChild = { href: string; label: string; hint?: string };
+export type NavItem = { href: string; label: string; children?: NavChild[] };
 
 type HeaderProps = {
   siteName: string;
@@ -94,19 +95,23 @@ function HeaderView({ siteName, logo, nav, phone, whatsapp, announcement, pathna
           </HomeLink>
 
           <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "rounded-lg px-3.5 py-2 text-[0.92rem] font-semibold transition-colors",
-                  isActive(item.href) ? "bg-sand text-ink" : "text-ink/70 hover:bg-sand hover:text-ink",
-                )}
-                aria-current={isActive(item.href) ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {nav.map((item) =>
+              item.children ? (
+                <NavDropdown key={item.label} item={item} isActive={isActive} />
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "rounded-lg px-3.5 py-2 text-[0.92rem] font-semibold transition-colors",
+                    isActive(item.href) ? "bg-sand text-ink" : "text-ink/70 hover:bg-sand hover:text-ink",
+                  )}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              ),
+            )}
           </nav>
 
           <div className="flex items-center gap-2">
@@ -150,15 +155,29 @@ function HeaderView({ siteName, logo, nav, phone, whatsapp, announcement, pathna
             className="fixed inset-x-0 bottom-0 z-[45] overflow-y-auto border-t border-line bg-white text-ink lg:hidden"
           >
             <nav aria-label="Mobile" className="container-x flex flex-col py-4">
-              {[{ href: "/", label: "Home" }, ...nav].map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn("border-b border-line py-4 font-display text-2xl font-semibold", isActive(item.href) && "text-forest")}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              <Link href="/" className={cn("border-b border-line py-4 font-display text-2xl font-semibold", isActive("/") && "text-forest")}>Home</Link>
+              {nav.map((item) =>
+                item.children ? (
+                  <div key={item.label} className="border-b border-line py-4">
+                    <p className="text-xs font-bold tracking-[0.16em] text-muted uppercase">{item.label}</p>
+                    <ul className="mt-2 grid gap-0.5">
+                      {item.children.map((c) => (
+                        <li key={c.href}>
+                          <Link href={c.href} className={cn("block py-2 font-display text-xl font-semibold", isActive(c.href) && "text-forest")}>{c.label}</Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn("border-b border-line py-4 font-display text-2xl font-semibold", isActive(item.href) && "text-forest")}
+                  >
+                    {item.label}
+                  </Link>
+                ),
+              )}
               <Link href="/enquiry/track" className="border-b border-line py-4 font-display text-2xl font-semibold">
                 Track my enquiry
               </Link>
@@ -221,5 +240,59 @@ export function ActionBar({ phone, whatsapp }: { phone: string; whatsapp: string
         )}
       </div>
     </>
+  );
+}
+
+
+/** Desktop dropdown: opens on hover, focus or click; closes on Escape or when focus leaves. */
+function NavDropdown({ item, isActive }: { item: NavItem; isActive: (href: string) => boolean }) {
+  const [open, setOpen] = useState(false);
+  const active = item.children!.some((c) => isActive(c.href));
+  const wrap = useRef<HTMLDivElement>(null);
+  return (
+    <div
+      ref={wrap}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onBlur={(e) => {
+        if (!wrap.current?.contains(e.relatedTarget as Node)) setOpen(false);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="true"
+        onClick={() => setOpen((o) => !o)}
+        className={cn(
+          "flex items-center gap-1 rounded-lg px-3.5 py-2 text-[0.92rem] font-semibold transition-colors",
+          active || open ? "bg-sand text-ink" : "text-ink/70 hover:bg-sand hover:text-ink",
+        )}
+      >
+        {item.label} <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 z-50 pt-2">
+          <ul className="min-w-64 rounded-2xl border border-line bg-white p-2 shadow-[0_24px_60px_-20px_rgba(15,28,58,.35)]">
+            {item.children!.map((c) => (
+              <li key={c.href}>
+                <Link
+                  href={c.href}
+                  onClick={() => setOpen(false)}
+                  className={cn("block rounded-xl px-3.5 py-2.5 hover:bg-sand", isActive(c.href) && "bg-sand")}
+                  aria-current={isActive(c.href) ? "page" : undefined}
+                >
+                  <span className="block text-[0.93rem] font-semibold">{c.label}</span>
+                  {c.hint && <span className="block text-xs text-muted">{c.hint}</span>}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }

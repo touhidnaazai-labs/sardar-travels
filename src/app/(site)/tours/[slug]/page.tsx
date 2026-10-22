@@ -289,7 +289,7 @@ async function TourContent({ params }: { params: Promise<{ slug: string }> }) {
             <p className="eyebrow mb-4">Request a quote</p>
             <h2 id="enquire-h" className="mb-3 text-[clamp(1.8rem,3.4vw,2.6rem)] font-medium">Enquire about {tour.title}</h2>
             <p className="mb-10 max-w-xl text-muted">Share your dates and group. We’ll confirm availability and send a clear quote — your trip is only booked once you accept it.</p>
-            <EnquiryWizard type="tour" tourId={tour.id} subject={tour.title} tripFields={tourEnquiryFields({ multiDay: tour.durationDays > 1 })} tone="card" submitLabel="Send enquiry" />
+            <EnquiryWizard type="tour" tourId={tour.id} subject={tour.title} tripFields={tourEnquiryFields({ multiDay: tour.durationDays !== 1 })} tone="card" submitLabel="Send enquiry" />
           </section>
         </div>
 
