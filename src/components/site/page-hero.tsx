@@ -24,19 +24,13 @@ export function PageHero({
   return (
     <section
       className={cn(
-        "grain relative isolate flex flex-col overflow-hidden bg-ink text-white md:justify-end",
-        size === "lg" ? "md:min-h-[64svh]" : size === "md" ? "md:min-h-[46svh]" : "md:min-h-[16rem]",
+        "grain relative isolate flex flex-col justify-end overflow-hidden bg-ink text-white",
+        size === "lg" ? "min-h-[64svh]" : size === "md" ? "min-h-[46svh]" : "min-h-[16rem]",
       )}
     >
-      {/* Phones: the whole photo sits above the text. md+: full-bleed behind it. */}
-      {media && (
-        <div className="relative aspect-[16/10] w-full overflow-hidden md:absolute md:inset-0 md:-z-10 md:aspect-auto">
-          <MediaImage media={media} sizes="100vw" priority className="animate-kenburns" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_60%,var(--ink))] md:hidden" />
-        </div>
-      )}
-      <div className="absolute inset-0 -z-10 hidden bg-[linear-gradient(180deg,rgba(9,17,38,.45),rgba(9,17,38,.35)_40%,rgba(9,17,38,.92))] md:block" />
-      <div className={cn("container-x pb-10 md:pt-16 md:pb-14", media ? "pt-4" : "pt-10")}>
+      {media && <MediaImage media={media} sizes="100vw" priority className="-z-10 animate-kenburns" />}
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(9,17,38,.45),rgba(9,17,38,.35)_40%,rgba(9,17,38,.92))]" />
+      <div className="container-x pt-16 pb-10 md:pb-14">
         {crumbs && (
           <nav aria-label="Breadcrumb" className="mb-6 animate-fade-up text-xs text-white/70">
             <ol className="flex flex-wrap items-center gap-2">
